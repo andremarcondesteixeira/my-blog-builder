@@ -86,7 +86,11 @@ fn input_folder_and_files_should_be_left_unchanged(input: &InputFolderAndFiles) 
 fn base_file_should_be_unchanged(input: &InputFolderAndFiles) {
     let base_file_content =
         fs::read_to_string(input.template_file.path()).expect("base file not found");
-    assert_eq!(String::from("Hello #CONTENT"), base_file_content);
+    assert_eq!(
+        String::from("Hello #CONTENT"),
+        base_file_content,
+        "base file content should be unchanged"
+    );
 }
 
 fn config_file_should_be_unchanged(input: &InputFolderAndFiles) {
@@ -94,33 +98,52 @@ fn config_file_should_be_unchanged(input: &InputFolderAndFiles) {
         fs::read_to_string(input.config_file.path()).expect("config file not found");
     assert_eq!(
         String::from("extends = \"./base.txt\""),
-        config_file_content
+        config_file_content,
+        "config file content should be unchanged"
     );
 }
 
 fn original_file_should_be_unchanged(input: &InputFolderAndFiles) {
     let file_before_content =
         fs::read_to_string(input.file_before.path()).expect("original file not found");
-    assert_eq!(String::from("World!"), file_before_content);
+    assert_eq!(
+        String::from("World!"),
+        file_before_content,
+        "original file should be unchanged"
+    );
 }
 
 fn no_new_files_should_have_been_created_in_the_input_folder(input: &InputFolderAndFiles) {
     let dir_content = fs::read_dir(input.input_folder.path()).unwrap();
     let amount_of_childs = dir_content.count();
-    assert_eq!(3, amount_of_childs);
+    assert_eq!(
+        3, amount_of_childs,
+        "no new files should have been created in the input folder"
+    );
 }
 
 fn output_folder_and_files_should_be_generated_correctly(input: &InputFolderAndFiles) {
     let output_folder = input.input_folder.parent().unwrap().join("out");
     let output_folder_path = output_folder.as_path();
 
-    assert_eq!(true, output_folder_path.is_dir());
-    assert_eq!(1, fs::read_dir(output_folder_path).unwrap().count());
+    assert_eq!(
+        true,
+        output_folder_path.is_dir(),
+        "Output folder should exist"
+    );
+    assert_eq!(
+        1,
+        fs::read_dir(output_folder_path).unwrap().count(),
+        "Amount of generated files shoould be correct"
+    );
 
     let folder_contents = fs::read_dir(output_folder_path).unwrap();
     let created_file = folder_contents.enumerate().next().unwrap();
     let created_file_path = (created_file.1).unwrap().path();
     let created_file_content = fs::read_to_string(created_file_path).unwrap();
 
-    assert_eq!("Hello World!", created_file_content);
+    assert_eq!(
+        "Hello World!", created_file_content,
+        "generated file content should be correct"
+    );
 }
